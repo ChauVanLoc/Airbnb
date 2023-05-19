@@ -14,7 +14,7 @@ import { ApiResponse } from 'src/types/ApiResponse.type';
 import { omit } from 'lodash';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
-import { CacheConstant } from '../constants/Cache.constant';
+import { CreateCacheKey } from '../utils/CreateCachekey';
 
 @Injectable()
 export class AuthService {
@@ -60,20 +60,30 @@ export class AuthService {
   async createJWT(
     data: Omit<user, 'password'>,
   ): Promise<ApiResponse<{ access_token: string }>> {
-    const isTokenExist = await this.cache.get(String(data.user_id));
-    if (isTokenExist) {
-      throw new HttpException(
-        'You can not login two device at time!',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    // const isAccessTokenExist = await this.cache.get(
+    //   CreateCacheKey(data.user_id, 'access_token'),
+    // );
+    // if (isAccessTokenExist) {
+    //   throw new HttpException(
+    //     'You can not login two device at time!',
+    //     HttpStatus.BAD_REQUEST,
+    //   );
+    // }
     const access_token = await this.jwt.sign(data, {
-      expiresIn: process.env.EXPIRED_ACCESSTOKEN || '8h',
+      expiresIn: '8h',
+    });
+    const refresh_token = await this.jwt.sign(data, {
+      expiresIn: '7d',
     });
     await this.cache.set(
-      String(data.user_id),
-      'Bearer ' + access_token,
-      3600 * 8,
+      CreateCacheKey(data.user_id, 'access_token'),
+      access_token,
+      1000 * 60 * 60 * 8,
+    );
+    await this.cache.set(
+      CreateCacheKey(data.user_id, 'refresh_token'),
+      refresh_token,
+      1000 * 60 * 60 * 24 * 7,
     );
     return {
       message: 'Login successfull!',
@@ -166,8 +176,8 @@ export class AuthService {
     };
   }
 
-  async logout(): Promise<ApiResponse<{}>> {
-    await this.cache.del(CacheConstant.access_token);
+  async logout(user_id: number): Promise<ApiResponse<{}>> {
+    await this.cache.del(CreateCacheKey(user_id, 'access_token'));
     return {
       message: 'Logout successfull!',
       data: {},

@@ -13,9 +13,10 @@ import { user } from '@prisma/client';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { CacheConstant } from 'src/constants/Cache.constant';
+import { CreateCacheKey } from 'src/utils/CreateCachekey';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class JwtAuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     private reflector: Reflector,
@@ -36,14 +37,16 @@ export class AuthGuard implements CanActivate {
     if (!token) {
       throw new UnauthorizedException();
     }
-    const tokenInCache = await this.cache.get(CacheConstant.access_token);
-    if (token !== tokenInCache) {
-      throw new UnauthorizedException();
-    }
     try {
       const payload: Omit<user, 'password'> = await this.jwtService.verifyAsync(
         token,
       );
+      // const tokenInCache = await this.cache.get(
+      //   CreateCacheKey(payload.user_id, 'access_token'),
+      // );
+      // if (token !== tokenInCache) {
+      //   throw new UnauthorizedException();
+      // }
       request['user'] = payload;
     } catch {
       throw new UnauthorizedException();

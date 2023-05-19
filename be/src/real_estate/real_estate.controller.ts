@@ -11,6 +11,7 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  Delete,
 } from '@nestjs/common';
 import { RealEstateService } from './real_estate.service';
 import { RealEstateQueryDTO } from './dto/RealEstateQueryDTO';
@@ -19,6 +20,7 @@ import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { CreateRealEstateQueryDTO } from './dto/CreateRealEstateDTO';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { FilesUploadDto } from './dto/FilesUploadDto';
+import { DeleteRealEstateDTO } from './dto/DeleteRealEstateDTO';
 
 @ApiTags('Real estate')
 @Controller('real-estate')
@@ -44,7 +46,7 @@ export class RealEstateController {
     description: 'List of real estate',
     type: FilesUploadDto,
   })
-  createRealEstate(
+  create(
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -56,6 +58,11 @@ export class RealEstateController {
     images: Array<Express.Multer.File>,
     @Body() body: CreateRealEstateQueryDTO,
   ) {
-    return this.realEstateService.createRealEstate();
+    return this.realEstateService.create();
+  }
+
+  @Delete()
+  delete(@Body() body: DeleteRealEstateDTO) {
+    return this.realEstateService.delete();
   }
 }

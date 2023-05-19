@@ -6,6 +6,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsPhoneNumber,
+  IsString,
   Matches,
   MaxLength,
 } from 'class-validator';
@@ -30,8 +31,6 @@ export class ProfileDTO {
 
   @ApiProperty()
   @IsOptional()
-  @IsPhoneNumber('VE', {
-    message: 'Currently, The system only accept phone of VietNam',
-  })
+  @IsString()
   phone: string;
 }

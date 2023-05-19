@@ -96,7 +96,9 @@ export class RealEstateService {
     };
   }
 
-  async createRealEstate() {
+  async create() {
     // const
   }
+
+  async delete() {}
 }
