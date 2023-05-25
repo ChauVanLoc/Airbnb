@@ -2,20 +2,44 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsBoolean,
   IsEnum,
-  IsNumber,
+  IsPositive,
   IsString,
   MaxLength,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { ConflicPrice } from 'src/utils/ConflicPrice';
 
-export class CreateRealEstateQueryDTO {
+export class CreateRealEstateDTO {
+  @ApiProperty({
+    type: 'array',
+    items: {
+      type: 'string',
+      format: 'binary',
+    },
+    description: 'Maximum 5 images/*',
+  })
+  files: Express.Multer.File[];
+
   @ApiProperty()
   @IsString()
   @MaxLength(200, { message: 'Max lenght is 200!' })
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    isArray: true,
+    enum: [
+      'rooms',
+      'castles',
+      'beachfront',
+      'iconiccities',
+      'desert',
+      'omg',
+      'adapted',
+      'hanoks',
+      'amazingpools',
+      'lakefront',
+      'amazingviews',
+    ],
+  })
   @IsEnum(
     [
       'rooms',
@@ -48,53 +72,28 @@ export class CreateRealEstateQueryDTO {
     | 'amazingviews';
 
   @ApiProperty()
-  @Transform((value) => {
-    if (Number(value) < 0) {
-      return 1;
-    }
-    return value;
-  })
-  @IsNumber()
+  @IsPositive()
+  @Transform(({ value }) => Number(value))
   location_id: number;
 
   @ApiProperty()
-  @Transform((value) => {
-    if (Number(value) < 0) {
-      return 1;
-    }
-    return value;
-  })
-  @IsNumber()
+  @IsPositive()
+  @Transform(({ value }) => Number(value))
   capacity: number;
 
   @ApiProperty()
-  @Transform((value) => {
-    if (Number(value) < 0) {
-      return 1;
-    }
-    return value;
-  })
-  @IsNumber()
+  @IsPositive()
+  @Transform(({ value }) => Number(value))
   room_amount: number;
 
   @ApiProperty()
-  @Transform((value) => {
-    if (Number(value) < 0) {
-      return 1;
-    }
-    return value;
-  })
-  @IsNumber()
+  @IsPositive()
+  @Transform(({ value }) => Number(value))
   bed_amount: number;
 
   @ApiProperty()
-  @Transform((value) => {
-    if (Number(value) < 0) {
-      return 1;
-    }
-    return value;
-  })
-  @IsNumber()
+  @IsPositive()
+  @Transform(({ value }) => Number(value))
   bathroom_amount: number;
 
   @ApiProperty()
@@ -103,38 +102,47 @@ export class CreateRealEstateQueryDTO {
   description: string;
 
   @ApiProperty()
-  @IsNumber()
+  @IsPositive()
+  @Transform(({ value }) => Number(value))
   price: number;
 
-  @ApiProperty()
+  @ApiProperty({ default: false })
   @IsBoolean()
+  @Transform(({ value }) => Boolean(value))
   washingmachine: boolean;
 
-  @ApiProperty()
+  @ApiProperty({ default: false })
   @IsBoolean()
+  @Transform(({ value }) => Boolean(value))
   iron: boolean;
 
-  @ApiProperty()
+  @ApiProperty({ default: false })
   @IsBoolean()
+  @Transform(({ value }) => Boolean(value))
   television: boolean;
 
-  @ApiProperty()
+  @ApiProperty({ default: false })
   @IsBoolean()
+  @Transform(({ value }) => Boolean(value))
   airconditioner: boolean;
 
-  @ApiProperty()
+  @ApiProperty({ default: false })
   @IsBoolean()
+  @Transform(({ value }) => Boolean(value))
   wifi: boolean;
 
-  @ApiProperty()
+  @ApiProperty({ default: false })
   @IsBoolean()
+  @Transform(({ value }) => Boolean(value))
   kitchen: boolean;
 
-  @ApiProperty()
+  @ApiProperty({ default: false })
   @IsBoolean()
+  @Transform(({ value }) => Boolean(value))
   parkinglot: boolean;
 
-  @ApiProperty()
+  @ApiProperty({ default: false })
   @IsBoolean()
+  @Transform(({ value }) => Boolean(value))
   pool: boolean;
 }

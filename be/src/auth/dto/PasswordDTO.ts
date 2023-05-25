@@ -7,7 +7,7 @@ import {
   Matches,
   MaxLength,
 } from 'class-validator';
-import { NotMatch } from 'src/utils/NotMatch';
+import { NotMatch } from 'src/decorators/NotMatch';
 
 export class PasswordDTO {
   @ApiProperty()

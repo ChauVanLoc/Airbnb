@@ -1,14 +1,38 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsEnum, IsNumber, MaxLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsOptional,
+  IsPositive,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
-import { ConflicPrice } from 'src/utils/ConflicPrice';
+import { ConflicPrice } from 'src/decorators/ConflicPrice';
 
 export class RealEstateQueryDTO {
   @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   @MaxLength(200, { message: 'Max lenght is 200!' })
-  name: string;
+  name?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    enum: [
+      'rooms',
+      'castles',
+      'beachfront',
+      'iconiccities',
+      'desert',
+      'omg',
+      'adapted',
+      'hanoks',
+      'amazingpools',
+      'lakefront',
+      'amazingviews',
+    ],
+  })
+  @IsOptional()
   @IsEnum(
     [
       'rooms',
@@ -27,7 +51,7 @@ export class RealEstateQueryDTO {
       message: 'Type is invalid!',
     },
   )
-  type:
+  type?:
     | 'rooms'
     | 'castles'
     | 'beachfront'
@@ -41,93 +65,114 @@ export class RealEstateQueryDTO {
     | 'amazingviews';
 
   @ApiPropertyOptional()
-  @Transform((value) => {
-    if (Number(value) < 0) {
-      return 1;
-    }
-    return value;
-  })
-  @IsNumber()
-  location_id: number;
+  @IsOptional()
+  @Transform(({ value }) => Number(value))
+  @IsPositive()
+  location_id?: number;
 
   @ApiPropertyOptional()
-  @Transform((value) => {
-    if (Number(value) < 0) {
-      return 1;
-    }
-    return value;
-  })
-  @IsNumber()
-  capacity: number;
+  @IsOptional()
+  @Transform(({ value }) => Number(value))
+  @IsPositive()
+  capacity?: number;
 
   @ApiPropertyOptional()
-  @Transform((value) => {
-    if (Number(value) < 0) {
-      return 1;
-    }
-    return value;
-  })
-  @IsNumber()
-  room_amount: number;
+  @IsOptional()
+  @Transform(({ value }) => Number(value))
+  @IsPositive()
+  room_amount?: number;
 
   @ApiPropertyOptional()
-  @Transform((value) => {
-    if (Number(value) < 0) {
-      return 1;
-    }
-    return value;
-  })
-  @IsNumber()
-  bed_amount: number;
+  @IsOptional()
+  @Transform(({ value }) => Number(value))
+  @IsPositive()
+  bed_amount?: number;
 
   @ApiPropertyOptional()
-  @Transform((value) => {
-    if (Number(value) < 0) {
-      return 1;
-    }
-    return value;
-  })
-  @IsNumber()
-  bathroom_amount: number;
+  @IsOptional()
+  @Transform(({ value }) => Number(value))
+  @IsPositive()
+  bathroom_amount?: number;
 
   @ApiPropertyOptional()
-  @IsNumber()
-  price_min: number;
+  @IsOptional()
+  @Transform(({ value }) => Number(value))
+  @IsPositive()
+  price_min?: number;
 
   @ConflicPrice('price_min')
   @ApiPropertyOptional()
-  @IsNumber()
-  price_max: number;
+  @IsOptional()
+  @Transform(({ value }) => Number(value))
+  @IsPositive()
+  price_max?: number;
 
   @ApiPropertyOptional()
+  @IsOptional()
   @IsBoolean()
-  washingmachine: boolean;
+  @Transform(({ value }) => Boolean(value))
+  washingmachine?: boolean;
 
   @ApiPropertyOptional()
+  @IsOptional()
   @IsBoolean()
-  iron: boolean;
+  @Transform(({ value }) => Boolean(value))
+  iron?: boolean;
 
   @ApiPropertyOptional()
+  @IsOptional()
   @IsBoolean()
-  television: boolean;
+  @Transform(({ value }) => Boolean(value))
+  television?: boolean;
 
   @ApiPropertyOptional()
+  @IsOptional()
   @IsBoolean()
-  airconditioner: boolean;
+  @Transform(({ value }) => Boolean(value))
+  airconditioner?: boolean;
 
   @ApiPropertyOptional()
+  @IsOptional()
   @IsBoolean()
-  wifi: boolean;
+  @Transform(({ value }) => Boolean(value))
+  wifi?: boolean;
 
   @ApiPropertyOptional()
+  @IsOptional()
   @IsBoolean()
-  kitchen: boolean;
+  @Transform(({ value }) => Boolean(value))
+  kitchen?: boolean;
 
   @ApiPropertyOptional()
+  @IsOptional()
   @IsBoolean()
-  parkinglot: boolean;
+  @Transform(({ value }) => Boolean(value))
+  parkinglot?: boolean;
 
   @ApiPropertyOptional()
+  @IsOptional()
   @IsBoolean()
-  pool: boolean;
+  @Transform(({ value }) => Boolean(value))
+  pool?: boolean;
+
+  @ApiPropertyOptional({ default: 1 })
+  @Transform(({ value }) => Number(value))
+  @IsPositive()
+  @IsOptional()
+  page?: number;
+
+  @ApiPropertyOptional({ default: 5 })
+  @Transform(({ value }) => Number(value))
+  @IsPositive()
+  @IsOptional()
+  limit?: number;
+
+  @ApiPropertyOptional({
+    default: 'asc',
+    enum: ['asc', 'desc'],
+    description: 'Sort by price',
+  })
+  @IsEnum(['asc', 'desc'])
+  @IsOptional()
+  order_by?: 'asc' | 'desc';
 }

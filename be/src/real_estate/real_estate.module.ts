@@ -13,7 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
           callback(null, process.cwd() + '/public/images');
         },
         filename(req, file, callback) {
-          callback(null, `${Date.now()}${uuidv4()}-${file.originalname}`);
+          callback(null, `${Date.now()}${uuidv4()}${file.originalname}`);
         },
       }),
     }),

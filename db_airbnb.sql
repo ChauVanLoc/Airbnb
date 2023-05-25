@@ -9,21 +9,25 @@ create table user (
     phone varchar(15) not null,
     birthday Date,
     gender enum('male', 'female', 'other') not null,
-    role int not null,
+    role enum('user', 'admin') not null,
     created timestamp default current_timestamp,
     updated timestamp
 );
 
 create table location (
 	location_id int primary key auto_increment,
-    location_name varchar(100),
-    city varchar(100),
-    country varchar(100),
+    location_name varchar(100) not null,
+    city varchar(100) not null,
+    country varchar(100) not null,
     image varchar(100)
 );
 
+insert into location values (0, 'ktx khu B', 'hcm', 'vietnam', '');
+insert into location values (0, 'ktx khu A', 'hcm', 'vietnam', '');
+
 create table real_estate (
 	re_id int primary key auto_increment,
+    user_id int not null,
     name varchar(200) not null,
     type enum('rooms', 'castles', 'beachfront', 'iconiccities', 'desert', 'omg', 'adapted', 'hanoks', 'amazingpools', 'lakefront', 'amazingviews') not null,
     images json not null,
@@ -43,7 +47,8 @@ create table real_estate (
     parkinglot boolean not null,
     pool boolean not null,
     created timestamp default current_timestamp,
-    updated timestamp
+    updated timestamp,
+    foreign key (user_id) references user(user_id)
 );
 
 create table book_room(
@@ -52,7 +57,7 @@ create table book_room(
     user_id int not null,
     book_date Date not null,
     checkout_date Date not null,
-    capacity int not null,
+    amount_people int not null,
     created timestamp default current_timestamp,
     foreign key (re_id) references real_estate(re_id),
     foreign key (user_id) references user(user_id)
@@ -64,5 +69,7 @@ create table comment(
     user_id int not null,
     content varchar(500),
     created timestamp default current_timestamp,
-    updated timestamp
+    updated timestamp,
+	foreign key (user_id) references user(user_id),
+    foreign key (re_id) references real_estate(re_id)
 );

@@ -17,6 +17,7 @@ async function bootstrap() {
     .setTitle('Airbnb Api')
     .setDescription('The api for airbnb')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);

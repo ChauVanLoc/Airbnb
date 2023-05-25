@@ -10,7 +10,7 @@ import { APP_GUARD } from '@nestjs/core';
 @Module({
   imports: [
     JwtModule.register({
-      secret: process.env.PRIVATE_KEY || 'chauvanloc',
+      secret: process.env.PRIVATE_KEY_AC || 'chauvanloc',
     }),
     PassportModule,
   ],
