@@ -12,10 +12,10 @@ export class RealEstateService {
 
   @Public()
   async all(data: RealEstateQuery) {
-    const limit = data.limit || 5;
+    const limit = data.limit || 10;
+    const page = data.page || 1;
     const real_estate = await this.prisma.real_estate.findMany({
       where: {
-        ...omit(data, ['page', 'limit', 'order_by', 'price_min', 'price_max']),
         price: {
           gte: data.price_min,
           lte: data.price_max,
@@ -23,15 +23,98 @@ export class RealEstateService {
         name: {
           contains: data.name,
         },
+        bed_amount: {
+          gte: data.bed_amount || 1,
+        },
+        bathroom_amount: {
+          gte: data.bathroom_amount || 1,
+        },
+        capacity: {
+          gte: data.capacity || 1,
+        },
+        room_amount: {
+          gte: data.room_amount || 1,
+        },
+        airconditioner: {
+          equals: data.airconditioner || true,
+        },
+        iron: {
+          equals: data.iron,
+        },
+        kitchen: {
+          equals: data.kitchen || true,
+        },
+        parkinglot: {
+          equals: data.parkinglot || true,
+        },
+        television: {
+          equals: data.television || true,
+        },
+        pool: {
+          equals: data.pool || false,
+        },
+        washingmachine: {
+          equals: data.washingmachine || true,
+        },
+        wifi: {
+          equals: data.wifi || true,
+        },
       },
       include: {
         user: true,
         book_room: true,
       },
-      skip: data.page >= 1 ? (data.page - 1) * limit : 0,
+      skip: page > 1 ? (page - 1) * limit : 0,
       take: limit,
       orderBy: {
         price: data.order_by || 'asc',
+      },
+    });
+    const re_all = await this.prisma.real_estate.findMany({
+      where: {
+        price: {
+          gte: data.price_min,
+          lte: data.price_max,
+        },
+        name: {
+          contains: data.name,
+        },
+        bed_amount: {
+          gte: data.bed_amount || 1,
+        },
+        bathroom_amount: {
+          gte: data.bathroom_amount || 1,
+        },
+        capacity: {
+          gte: data.capacity || 1,
+        },
+        room_amount: {
+          gte: data.room_amount || 1,
+        },
+        airconditioner: {
+          equals: data.airconditioner || true,
+        },
+        iron: {
+          equals: data.iron,
+        },
+        kitchen: {
+          equals: data.kitchen || true,
+        },
+        parkinglot: {
+          equals: data.parkinglot || true,
+        },
+        television: {
+          equals: data.television || true,
+        },
+        pool: {
+          equals: data.pool || false,
+        },
+        washingmachine: {
+          equals: data.washingmachine || true,
+        },
+        wifi: {
+          equals: data.wifi || true,
+        },
       },
     });
     return {
@@ -39,8 +122,8 @@ export class RealEstateService {
       data: {
         real_estates: real_estate.map((re) => omit(re, ['user.password'])),
         ...data,
-        page: data.page || 1,
-        page_size: Math.ceil(real_estate.length / limit),
+        page,
+        page_size: Math.ceil(re_all.length / limit),
         limit,
         order_by: data.order_by || 'asc',
       },
@@ -55,7 +138,7 @@ export class RealEstateService {
       },
       include: {
         user: true,
-        book_room: true,
+        comment: true,
         _count: true,
       },
     });
@@ -76,6 +159,17 @@ export class RealEstateService {
     body: Omit<real_estate, 'images' | 'created' | 'updated' | 're_id'>,
   ): Promise<ApiResponse<real_estate>> {
     const listImgsName = imgs.map((i) => i.filename).join('_');
+    const user = await this.prisma.user.findUnique({
+      where: {
+        user_id: body.user_id,
+      },
+    });
+    if (user.role === 'user') {
+      throw new HttpException(
+        'User has not permision create real estate',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     const new_re = await this.prisma.real_estate.create({
       data: {
         ...body,
@@ -105,23 +199,43 @@ export class RealEstateService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const listImgsName = imgs.map((i) => i.filename).join('_');
-    const update_re = await this.prisma.real_estate.update({
+    const user = await this.prisma.user.findUnique({
       where: {
-        re_id: body.re_id,
-      },
-      data: {
-        ...body,
-        images: listImgsName,
+        user_id: re.user_id,
       },
     });
+    if (user.role === 'user') {
+      throw new HttpException(
+        'User has not permision update real estate!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const listImgsName = imgs.map((i) => i.filename).join('_');
+    if (Object.keys(body).length > 1 || imgs.length > 0) {
+      const update_re = await this.prisma.real_estate.update({
+        where: {
+          re_id: body.re_id,
+        },
+        data:
+          imgs.length > 0
+            ? {
+                ...body,
+                images: listImgsName,
+              }
+            : body,
+      });
+      return {
+        message: 'Update real estate successfull!',
+        data: update_re,
+      };
+    }
     return {
       message: 'Update real estate successfull!',
-      data: update_re,
+      data: re,
     };
   }
 
-  async delete(re_id: number): Promise<ApiResponse<{}>> {
+  async delete(user_id: number, re_id: number): Promise<ApiResponse<{}>> {
     const re = await this.prisma.real_estate.findUnique({
       where: {
         re_id,
@@ -130,6 +244,23 @@ export class RealEstateService {
     if (!re) {
       throw new HttpException(
         'Real estate does not exist!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const user = await this.prisma.user.findUnique({
+      where: {
+        user_id,
+      },
+    });
+    if (user.role === 'user') {
+      throw new HttpException(
+        'User has not permision delete real estate!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (user.role === 'business' && re.user_id !== user_id) {
+      throw new HttpException(
+        'Business only deleted the real estate that was created by business!',
         HttpStatus.BAD_REQUEST,
       );
     }

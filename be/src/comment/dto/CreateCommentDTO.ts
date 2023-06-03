@@ -9,11 +9,6 @@ export class CreateCommentDTO {
   re_id: number;
 
   @ApiProperty()
-  @Transform(({ value }) => Number(value))
-  @IsPositive()
-  user_id: number;
-
-  @ApiProperty()
   @IsString()
   content: string;
 }

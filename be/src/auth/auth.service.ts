@@ -139,6 +139,36 @@ export class AuthService {
     };
   }
 
+  async business(
+    user_id: number,
+    cccd: string,
+  ): Promise<ApiResponse<Omit<user, 'password'>>> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        user_id,
+      },
+    });
+    if (!user) {
+      throw new HttpException('User does not exist!', HttpStatus.BAD_REQUEST);
+    }
+    if (user.role === 'business') {
+      throw new HttpException('User was a business!', HttpStatus.BAD_REQUEST);
+    }
+    const update_user = await this.prisma.user.update({
+      where: {
+        user_id,
+      },
+      data: {
+        role: 'business',
+        cccd,
+      },
+    });
+    return {
+      message: 'Update role of user to be business successfull',
+      data: omit(update_user, ['password']),
+    };
+  }
+
   async changeProfile(
     user_id: number,
     data: Partial<Pick<user, 'full_name' | 'birthday' | 'phone' | 'gender'>>,

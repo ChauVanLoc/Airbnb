@@ -110,49 +110,89 @@ export class RealEstateQueryDTO {
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    }
+    return false;
+  })
   washingmachine?: boolean;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    }
+    return false;
+  })
   iron?: boolean;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    }
+    return false;
+  })
   television?: boolean;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    }
+    return false;
+  })
   airconditioner?: boolean;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    }
+    return false;
+  })
   wifi?: boolean;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    }
+    return false;
+  })
   kitchen?: boolean;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    }
+    return false;
+  })
   parkinglot?: boolean;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    }
+    return false;
+  })
   pool?: boolean;
 
   @ApiPropertyOptional({ default: 1 })
@@ -161,7 +201,7 @@ export class RealEstateQueryDTO {
   @IsOptional()
   page?: number;
 
-  @ApiPropertyOptional({ default: 5 })
+  @ApiPropertyOptional({ default: 10 })
   @Transform(({ value }) => Number(value))
   @IsPositive()
   @IsOptional()

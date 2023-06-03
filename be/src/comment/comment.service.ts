@@ -1,16 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { comment } from '@prisma/client';
-import { Public } from 'src/metadata/public.metadata';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ApiResponse } from 'src/types/ApiResponse.type';
 
-@ApiTags('Comment')
 @Injectable()
 export class CommentService {
   constructor(private readonly prisma: PrismaService) {}
 
-  @Public()
   async all(
     query: Partial<
       Pick<comment, 'created' | 'updated'> & {
@@ -19,7 +16,9 @@ export class CommentService {
         limit: number;
       }
     >,
-  ): Promise<ApiResponse<comment[]>> {
+  ) {
+    const limit = query.limit || 10;
+    const page = query.page || 1;
     const cmts = await this.prisma.comment.findMany({
       include: {
         user: true,
@@ -27,19 +26,34 @@ export class CommentService {
       orderBy: {
         created: query.order_by || 'asc',
       },
-      take: query.limit || 5,
-      where: {
-        created: query.created,
-        updated: query.updated,
-      },
+      skip: page > 1 ? (page - 1) * limit : 0,
+      take: limit,
+      where: query.created
+        ? { created: query.created }
+        : query.updated
+        ? { updated: query.updated }
+        : {},
+    });
+    const cmt_all = await this.prisma.comment.findMany({
+      where: query.created
+        ? { created: query.created }
+        : query.updated
+        ? { updated: query.updated }
+        : {},
     });
     return {
       message: 'Get all comment successful!',
-      data: cmts,
+      data: {
+        comments: cmts,
+        ...query,
+        page,
+        limit,
+        page_size: Math.ceil(cmt_all.length / limit),
+        order_by: query.order_by || 'asc',
+      },
     };
   }
 
-  @Public()
   async detail(cmt_id: number): Promise<ApiResponse<comment>> {
     const cmt = await this.prisma.comment.findUnique({
       where: {
@@ -61,7 +75,6 @@ export class CommentService {
     };
   }
 
-  @ApiBearerAuth()
   async create(
     data: Omit<comment, 'cmt_id' | 'created' | 'updated'>,
   ): Promise<ApiResponse<comment>> {
@@ -76,13 +89,17 @@ export class CommentService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const user = await this.prisma.user.findUnique({
+    const book_room = await this.prisma.book_room.findFirst({
       where: {
         user_id: data.user_id,
+        re_id: data.re_id,
       },
     });
-    if (!user) {
-      throw new HttpException('User does not exist!', HttpStatus.BAD_REQUEST);
+    if (!book_room) {
+      throw new HttpException(
+        'User can not comment when has not book room',
+        HttpStatus.BAD_REQUEST,
+      );
     }
     const new_cmt = await this.prisma.comment.create({
       data,
@@ -93,9 +110,8 @@ export class CommentService {
     };
   }
 
-  @ApiBearerAuth()
   async update(
-    data: Partial<Omit<comment, 'created' | 'updated'>>,
+    data: Partial<Pick<comment, 'cmt_id' | 'content' | 'user_id'>>,
   ): Promise<ApiResponse<comment>> {
     const cmt = await this.prisma.comment.findUnique({
       where: {
@@ -108,14 +124,17 @@ export class CommentService {
         HttpStatus.BAD_REQUEST,
       );
     }
+    if (cmt.user_id !== data.user_id) {
+      throw new HttpException(
+        'User has not permision update this comment',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     const update_cmt = await this.prisma.comment.update({
       where: {
         cmt_id: data.cmt_id,
       },
       data,
-      include: {
-        user: true,
-      },
     });
     return {
       message: 'Update comment successfull!',
@@ -123,8 +142,7 @@ export class CommentService {
     };
   }
 
-  @ApiBearerAuth()
-  async delete(cmt_id: number): Promise<ApiResponse<{}>> {
+  async delete(user_id: number, cmt_id: number): Promise<ApiResponse<{}>> {
     const cmt = await this.prisma.comment.findUnique({
       where: {
         cmt_id,
@@ -133,6 +151,17 @@ export class CommentService {
     if (!cmt) {
       throw new HttpException(
         'Comment does not exist!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const user = await this.prisma.user.findUnique({
+      where: {
+        user_id,
+      },
+    });
+    if (user.role !== 'admin' && cmt.user_id !== user_id) {
+      throw new HttpException(
+        'User has not permision delete this comment',
         HttpStatus.BAD_REQUEST,
       );
     }

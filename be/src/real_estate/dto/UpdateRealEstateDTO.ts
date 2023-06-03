@@ -1,18 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsBoolean,
-  IsBooleanString,
   IsEnum,
-  IsNumber,
-  IsNumberString,
   IsOptional,
   IsPositive,
   IsString,
   MaxLength,
 } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
-import { ConflicPrice } from 'src/decorators/ConflicPrice';
-import { PositiveNumberString } from 'src/decorators/PositiveNumberString';
+import { Transform } from 'class-transformer';
 
 export class UpdateRealEstateDTO {
   @ApiPropertyOptional({
@@ -24,10 +19,16 @@ export class UpdateRealEstateDTO {
     description: 'Maximum 5 images/*',
   })
   @IsOptional()
-  files: any[];
+  @Transform(({ value }) => {
+    if (value === '') {
+      return undefined;
+    }
+    return value;
+  })
+  image: any[] | undefined;
 
   @ApiProperty()
-  @IsNumber()
+  @IsPositive()
   @Transform(({ value }) => Number(value))
   re_id: number;
 
@@ -35,7 +36,13 @@ export class UpdateRealEstateDTO {
   @IsOptional()
   @IsString()
   @MaxLength(200, { message: 'Max lenght is 200!' })
-  name: string;
+  @Transform(({ value }) => {
+    if (value === '') {
+      return undefined;
+    }
+    return value;
+  })
+  name: string | undefined;
 
   @ApiPropertyOptional({
     isArray: true,
@@ -52,6 +59,12 @@ export class UpdateRealEstateDTO {
       'lakefront',
       'amazingviews',
     ],
+  })
+  @Transform(({ value }) => {
+    if (value === '') {
+      return undefined;
+    }
+    return value;
   })
   @IsEnum(
     [
@@ -83,96 +96,188 @@ export class UpdateRealEstateDTO {
     | 'hanoks'
     | 'amazingpools'
     | 'lakefront'
-    | 'amazingviews';
+    | 'amazingviews'
+    | undefined;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsPositive()
-  // @PositiveNumberString()
-  @Transform(({ value }) => Number(value))
+  @Transform(({ value }) => {
+    if (value === '') {
+      return undefined;
+    }
+    return Number(value);
+  })
   location_id: number;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsPositive()
-  @Transform(({ value }) => Number(value))
-  capacity: number;
+  @Transform(({ value }) => {
+    if (value === '') {
+      return undefined;
+    }
+    return Number(value);
+  })
+  capacity: number | undefined;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsPositive()
-  @Transform(({ value }) => Number(value))
+  @Transform(({ value }) => {
+    if (value === '') {
+      return undefined;
+    }
+    return Number(value);
+  })
   room_amount: number;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsPositive()
-  @Transform(({ value }) => Number(value))
-  bed_amount: number;
+  @Transform(({ value }) => {
+    if (value === '') {
+      return undefined;
+    }
+    return Number(value);
+  })
+  bed_amount: number | undefined;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsPositive()
-  @Transform(({ value }) => Number(value))
-  bathroom_amount: number;
+  @Transform(({ value }) => {
+    if (value === '') {
+      return undefined;
+    }
+    return Number(value);
+  })
+  bathroom_amount: number | undefined;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   @MaxLength(2000, { message: 'Lenght of description is 2000 character!' })
-  description: string;
+  @Transform(({ value }) => {
+    if (value === '') {
+      return undefined;
+    }
+    return value;
+  })
+  description: string | undefined;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsPositive()
-  @Transform(({ value }) => Number(value))
-  price: number;
+  @Transform(({ value }) => {
+    if (value === '') {
+      return undefined;
+    }
+    return Number(value);
+  })
+  price: number | undefined;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
-  washingmachine: boolean;
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    } else if (value === 'false') {
+      return false;
+    }
+    return undefined;
+  })
+  washingmachine: boolean | undefined;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
-  iron: boolean;
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    } else if (value === 'false') {
+      return false;
+    }
+    return undefined;
+  })
+  iron: boolean | undefined;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
-  television: boolean;
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    } else if (value === 'false') {
+      return false;
+    }
+    return undefined;
+  })
+  television: boolean | undefined;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
-  airconditioner: boolean;
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    } else if (value === 'false') {
+      return false;
+    }
+    return undefined;
+  })
+  airconditioner: boolean | undefined;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
-  wifi: boolean;
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    } else if (value === 'false') {
+      return false;
+    }
+    return undefined;
+  })
+  wifi: boolean | undefined;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
-  kitchen: boolean;
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    } else if (value === 'false') {
+      return false;
+    }
+    return undefined;
+  })
+  kitchen: boolean | undefined;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
-  parkinglot: boolean;
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    } else if (value === 'false') {
+      return false;
+    }
+    return undefined;
+  })
+  parkinglot: boolean | undefined;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
-  pool: boolean;
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    } else if (value === 'false') {
+      return false;
+    }
+    return undefined;
+  })
+  pool: boolean | undefined;
 }

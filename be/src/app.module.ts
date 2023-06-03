@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Global, HttpException, HttpStatus } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { CacheModule, CacheInterceptor } from '@nestjs/cache-manager';
@@ -9,7 +9,11 @@ import { join } from 'path';
 import { CommentModule } from './comment/comment.module';
 import { LocationModule } from './location/location.module';
 import { BookRoomModule } from './book_room/book_room.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { v4 as uuidv4 } from 'uuid';
 
+@Global()
 @Module({
   imports: [
     CacheModule.register({

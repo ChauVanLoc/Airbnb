@@ -26,18 +26,13 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { CreateRealEstateDTO } from './dto/CreateRealEstateDTO';
-import {
-  FileFieldsInterceptor,
-  FilesInterceptor,
-} from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { UpdateRealEstateDTO } from './dto/UpdateRealEstateDTO';
 import { AuthRequest } from 'src/types/AuthRequest.type';
-import { FileUploadDto } from './dto/FileUploadDTO';
 
 @ApiTags('Real Estate')
 @ApiBearerAuth()
@@ -50,7 +45,6 @@ export class RealEstateController {
   @ApiOkResponse({ description: 'Get all real estate successfull' })
   @ApiBadRequestResponse({ description: 'Error backend' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  // @ApiQuery({ type: RealEstateQueryDTO })
   @Get()
   all(@Query() query: RealEstateQueryDTO) {
     return this.realEstateService.all(query);
@@ -82,7 +76,7 @@ export class RealEstateController {
     @UploadedFiles(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 5000 * 1000 }),
+          new MaxFileSizeValidator({ maxSize: Number(process.env.SIZE_IMAGE) }),
           new FileTypeValidator({ fileType: 'image/*' }),
         ],
       }),
@@ -101,7 +95,7 @@ export class RealEstateController {
   @ApiCreatedResponse({ description: 'Update real estate successfull' })
   @ApiBadRequestResponse({ description: 'Error backend' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @UseInterceptors(FilesInterceptor('file', 5))
+  @UseInterceptors(FilesInterceptor('image', 5))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     type: UpdateRealEstateDTO,
@@ -110,7 +104,7 @@ export class RealEstateController {
     @UploadedFiles(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 5000 * 1000 }),
+          new MaxFileSizeValidator({ maxSize: Number(process.env.SIZE_IMAGE) }),
           new FileTypeValidator({ fileType: 'image/*' }),
         ],
         fileIsRequired: false,
@@ -128,7 +122,7 @@ export class RealEstateController {
   @ApiBadRequestResponse({ description: 'Error backend' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiParam({ name: 're_id', required: true })
-  delete(@Param('re_id') param: number) {
-    return this.realEstateService.delete(param);
+  delete(@Req() req: AuthRequest, @Param('re_id') param: number) {
+    return this.realEstateService.delete(req.user.user_id, param);
   }
 }

@@ -20,6 +20,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ResetTokenDTO } from './dto/ResetTokenDTO';
+import { BusinessDTO } from './dto/BusinessDTO';
 
 @ApiTags('Auth')
 @Controller()
@@ -47,6 +48,15 @@ export class AuthController {
   @Post('register')
   register(@Body() body: RegisterDTO) {
     return this.authService.createUser(body);
+  }
+
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Become business' })
+  @ApiOkResponse({ description: 'Update user to be business successfull' })
+  @ApiBadRequestResponse({ description: 'Error backend' })
+  @Post('become-business')
+  business(@Req() req: AuthRequest, @Body() { cccd }: BusinessDTO) {
+    return this.authService.business(req.user.user_id, cccd);
   }
 
   @ApiBearerAuth()

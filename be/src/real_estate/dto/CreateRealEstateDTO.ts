@@ -17,7 +17,7 @@ export class CreateRealEstateDTO {
     },
     description: 'Maximum 5 images/*',
   })
-  files: Express.Multer.File[];
+  image: Express.Multer.File[];
 
   @ApiProperty()
   @IsString()
@@ -108,41 +108,89 @@ export class CreateRealEstateDTO {
 
   @ApiProperty({ default: false })
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    } else if (value === 'false') {
+      return false;
+    }
+  })
   washingmachine: boolean;
 
   @ApiProperty({ default: false })
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    } else if (value === 'false') {
+      return false;
+    }
+  })
   iron: boolean;
 
   @ApiProperty({ default: false })
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    } else if (value === 'false') {
+      return false;
+    }
+  })
   television: boolean;
 
   @ApiProperty({ default: false })
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    } else if (value === 'false') {
+      return false;
+    }
+  })
   airconditioner: boolean;
 
   @ApiProperty({ default: false })
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    } else if (value === 'false') {
+      return false;
+    }
+  })
   wifi: boolean;
 
   @ApiProperty({ default: false })
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    } else if (value === 'false') {
+      return false;
+    }
+  })
   kitchen: boolean;
 
   @ApiProperty({ default: false })
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    } else if (value === 'false') {
+      return false;
+    }
+  })
   parkinglot: boolean;
 
   @ApiProperty({ default: false })
   @IsBoolean()
-  @Transform(({ value }) => Boolean(value))
+  @Transform(({ value }) => {
+    if (value === 'true') {
+      return true;
+    } else if (value === 'false') {
+      return false;
+    }
+  })
   pool: boolean;
 }

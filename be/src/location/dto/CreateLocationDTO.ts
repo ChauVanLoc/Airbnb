@@ -2,8 +2,8 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, MaxLength } from 'class-validator';
 
 export class CreateLocationDTO {
-  // @ApiPropertyOptional({ type: 'string', format: 'binary' })
-  // files: any;
+  @ApiPropertyOptional({ type: 'string', format: 'binary' })
+  image: any;
 
   @ApiProperty()
   @IsString()

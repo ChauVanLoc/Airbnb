@@ -1,7 +1,16 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateLocationDTO {
+  @ApiPropertyOptional({ type: 'string', format: 'binary' })
+  image: any;
+
+  @ApiProperty()
+  @Transform(({ value }) => Number(value))
+  @IsNumber()
+  location_id: number;
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()

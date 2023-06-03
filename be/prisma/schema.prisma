@@ -79,6 +79,7 @@ model user {
   full_name   String        @db.VarChar(100)
   email       String        @db.VarChar(100)
   password    String        @db.VarChar(100)
+  cccd        String?       @db.VarChar(15)
   phone       String        @db.VarChar(15)
   birthday    DateTime?     @db.Date
   gender      user_gender
@@ -113,4 +114,5 @@ enum user_gender {
 enum user_role {
   user
   admin
+  business
 }

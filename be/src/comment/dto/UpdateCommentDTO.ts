@@ -9,18 +9,6 @@ export class UpdateCommentDTO {
   cmt_id: number;
 
   @ApiPropertyOptional()
-  @Transform(({ value }) => Number(value))
-  @IsPositive()
-  @IsOptional()
-  re_id: number;
-
-  @ApiPropertyOptional()
-  @Transform(({ value }) => Number(value))
-  @IsPositive()
-  @IsOptional()
-  user_id: number;
-
-  @ApiPropertyOptional()
   @IsString()
   @IsOptional()
   content: string;

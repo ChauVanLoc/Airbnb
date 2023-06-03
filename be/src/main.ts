@@ -5,6 +5,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ErrorValidate } from './types/ErrorValidate.type';
 import { ValidationError } from 'class-validator';
 import { ApiResponse } from './types/ApiResponse.type';
+import { MulterModule } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
