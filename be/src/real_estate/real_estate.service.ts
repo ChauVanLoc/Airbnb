@@ -20,45 +20,33 @@ export class RealEstateService {
           gte: data.price_min,
           lte: data.price_max,
         },
-        name: {
-          contains: data.name,
-        },
-        bed_amount: {
-          gte: data.bed_amount || 1,
-        },
-        bathroom_amount: {
-          gte: data.bathroom_amount || 1,
-        },
-        capacity: {
-          gte: data.capacity || 1,
-        },
-        room_amount: {
-          gte: data.room_amount || 1,
-        },
-        airconditioner: {
-          equals: data.airconditioner || true,
-        },
-        iron: {
-          equals: data.iron,
-        },
-        kitchen: {
-          equals: data.kitchen || true,
-        },
-        parkinglot: {
-          equals: data.parkinglot || true,
-        },
-        television: {
-          equals: data.television || true,
-        },
-        pool: {
-          equals: data.pool || false,
-        },
-        washingmachine: {
-          equals: data.washingmachine || true,
-        },
-        wifi: {
-          equals: data.wifi || true,
-        },
+        name: data.name ? { contains: data.name } : undefined,
+        bed_amount: data.bed_amount ? { equals: data.bed_amount } : undefined,
+        bathroom_amount: data.bathroom_amount
+          ? { equals: data.bathroom_amount }
+          : undefined,
+        capacity: data.capacity ? { equals: data.capacity } : undefined,
+        room_amount: data.room_amount
+          ? { equals: data.room_amount }
+          : undefined,
+        airconditioner: data.airconditioner ? data.airconditioner : undefined,
+        iron: data.iron ? data.iron : undefined,
+        kitchen: data.kitchen ? data.kitchen : undefined,
+        parkinglot: data.parkinglot ? data.parkinglot : undefined,
+        television: data.television ? data.television : undefined,
+        pool: data.pool ? data.pool : undefined,
+        washingmachine: data.washingmachine ? data.washingmachine : undefined,
+        wifi: data.wifi ? data.wifi : undefined,
+        location_id: data.location_id
+          ? {
+              equals: data.location_id,
+            }
+          : undefined,
+        type: data.type
+          ? {
+              equals: data.type,
+            }
+          : undefined,
       },
       include: {
         user: true,
@@ -76,45 +64,33 @@ export class RealEstateService {
           gte: data.price_min,
           lte: data.price_max,
         },
-        name: {
-          contains: data.name,
-        },
-        bed_amount: {
-          gte: data.bed_amount || 1,
-        },
-        bathroom_amount: {
-          gte: data.bathroom_amount || 1,
-        },
-        capacity: {
-          gte: data.capacity || 1,
-        },
-        room_amount: {
-          gte: data.room_amount || 1,
-        },
-        airconditioner: {
-          equals: data.airconditioner || true,
-        },
-        iron: {
-          equals: data.iron,
-        },
-        kitchen: {
-          equals: data.kitchen || true,
-        },
-        parkinglot: {
-          equals: data.parkinglot || true,
-        },
-        television: {
-          equals: data.television || true,
-        },
-        pool: {
-          equals: data.pool || false,
-        },
-        washingmachine: {
-          equals: data.washingmachine || true,
-        },
-        wifi: {
-          equals: data.wifi || true,
-        },
+        name: data.name ? { contains: data.name } : undefined,
+        bed_amount: data.bed_amount ? { equals: data.bed_amount } : undefined,
+        bathroom_amount: data.bathroom_amount
+          ? { equals: data.bathroom_amount }
+          : undefined,
+        capacity: data.capacity ? { equals: data.capacity } : undefined,
+        room_amount: data.room_amount
+          ? { equals: data.room_amount }
+          : undefined,
+        airconditioner: data.airconditioner ? data.airconditioner : undefined,
+        iron: data.iron ? data.iron : undefined,
+        kitchen: data.kitchen ? data.kitchen : undefined,
+        parkinglot: data.parkinglot ? data.parkinglot : undefined,
+        television: data.television ? data.television : undefined,
+        pool: data.pool ? data.pool : undefined,
+        washingmachine: data.washingmachine ? data.washingmachine : undefined,
+        wifi: data.wifi ? data.wifi : undefined,
+        location_id: data.location_id
+          ? {
+              equals: data.location_id,
+            }
+          : undefined,
+        type: data.type
+          ? {
+              equals: data.type,
+            }
+          : undefined,
       },
     });
     return {
@@ -184,9 +160,7 @@ export class RealEstateService {
 
   async update(
     imgs: Express.Multer.File[],
-    body: Partial<
-      Omit<real_estate, 'images' | 'user_id' | 'created' | 'updated'>
-    >,
+    body: Partial<Omit<real_estate, 'images' | 'created' | 'updated'>>,
   ): Promise<ApiResponse<real_estate>> {
     const re = await this.prisma.real_estate.findUnique({
       where: {
@@ -199,12 +173,7 @@ export class RealEstateService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const user = await this.prisma.user.findUnique({
-      where: {
-        user_id: re.user_id,
-      },
-    });
-    if (user.role === 'user') {
+    if (body.user_id !== re.user_id) {
       throw new HttpException(
         'User has not permision update real estate!',
         HttpStatus.BAD_REQUEST,

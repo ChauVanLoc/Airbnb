@@ -112,8 +112,12 @@ export class RealEstateController {
     )
     files: Express.Multer.File[],
     @Body() body: UpdateRealEstateDTO,
+    @Req() req: AuthRequest,
   ) {
-    return this.realEstateService.update(files, body);
+    return this.realEstateService.update(files, {
+      ...body,
+      user_id: req.user.user_id,
+    });
   }
 
   @Delete(':re_id')

@@ -82,29 +82,29 @@ export class AuthService {
   async login(
     data: Pick<user, 'user_id' | 'role'>,
   ): Promise<ApiResponse<LoginResponse>> {
-    // const accessTokenKey = CreateCacheKey(data.user_id, 'access_token');
-    // const refreshTokenKey = CreateCacheKey(data.user_id, 'refresh_token');
+    const accessTokenKey = CreateCacheKey(data.user_id, 'access_token');
+    const refreshTokenKey = CreateCacheKey(data.user_id, 'refresh_token');
 
-    // const isAccessTokenExist = await this.cache.get(accessTokenKey);
+    const isAccessTokenExist = await this.cache.get(accessTokenKey);
 
-    // if (isAccessTokenExist) {
-    //   throw new HttpException(
-    //     'You can not login two device at time!',
-    //     HttpStatus.BAD_REQUEST,
-    //   );
-    // }
+    if (isAccessTokenExist) {
+      throw new HttpException(
+        'You can not login two device at time!',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     const access_token = await this.createToken(data, 'access_token');
     const refresh_token = await this.createToken(data, 'refresh_token');
-    // await this.cache.set(
-    //   accessTokenKey,
-    //   access_token,
-    //   this.expired_access_token,
-    // );
-    // await this.cache.set(
-    //   refreshTokenKey,
-    //   refresh_token,
-    //   this.expired_refresh_token,
-    // );
+    await this.cache.set(
+      accessTokenKey,
+      access_token,
+      this.expired_access_token,
+    );
+    await this.cache.set(
+      refreshTokenKey,
+      refresh_token,
+      this.expired_refresh_token,
+    );
     return {
       message: 'Login successfull!',
       data: {
@@ -260,10 +260,7 @@ export class AuthService {
       CreateCacheKey(payload.user_id, 'refresh_token'),
     );
     if (!refreshTokenFromCache || refreshTokenFromCache !== refresh_token) {
-      throw new HttpException(
-        'Refresh token does not exist!',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException('Refresh token invalid!', HttpStatus.BAD_REQUEST);
     }
     await this.cache.del(CreateCacheKey(payload.user_id, 'refresh_token'));
 
